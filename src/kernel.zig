@@ -1,6 +1,7 @@
 const common = @import("common.zig");
 const serial = @import("serial.zig");
 const tty = @import("tty.zig");
+const gdt = @import("gdt.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
 const MULTIBOOT_FLAG_ALIGN = 1 << 0;
@@ -63,9 +64,13 @@ print_logo() void
 noinline fn 
 kmain() callconv(.c) noreturn 
 {
-	tty.init();
 	serial.init();
+	tty.init();
+
 	print_logo();
+
+	gdt.init();
+
 	tty.print("hai :3\n", .{});
 
 	while(true) {

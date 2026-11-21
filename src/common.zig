@@ -1,3 +1,5 @@
+const gdt = @import("gdt.zig");
+
 pub fn
 inb(port: u16) u8
 {
@@ -59,6 +61,43 @@ outl(port: u16, data: u32) void
 		:
 		: [port] "{dx}" (port),
 		  [data] "{eax}" (data),
+	);
+}
+
+pub fn
+lgdt(pgdt: *const gdt.GdtPtr) void
+{
+	// Load gdt into CPU
+	asm volatile(
+		\\ lgdt (%%eax)
+		:
+		: [pgdt] "{eax}" (pgdt),
+	);
+
+	// Load the kernel data segment
+	asm volatile(
+		\\ mov %%bx, %%ds
+		:
+		: [KERNEL_DATA_OFFSET] "{bx}" (gdt.KERNEL_DATA_OFFSET),
+	);
+
+	asm volatile ("mov %%bx, %%es");
+	asm volatile ("mov %%bx, %%fs");
+	asm volatile ("mov %%bx, %%gs");
+	asm volatile ("mov %%bx, %%ss");
+
+	asm volatile (
+		\\ ljmp $0x08, $1f
+		\\ 1:
+	);
+}
+
+pub fn
+ltr(offset: u16) void {
+	asm volatile(
+		\\ ltr %%ax
+		:
+		: [offset] "{ax}" (offset),
 	);
 }
 
