@@ -75,6 +75,11 @@ kmain() callconv(.c) noreturn
 	gdt.init();
 
 	tty.print("hai :3\n", .{});
+	tty.print(
+		\\This program comes with ABSOLUTELY NO WARRANTY
+		\\This is free software that is distributed under the terms of the GNU GPL v.3.0
+		\\You should have recieved the text of it with your copy of the program
+		, .{});
 
 	while(true) {
 		common.halt_cpu();
