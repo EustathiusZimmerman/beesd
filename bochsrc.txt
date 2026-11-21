@@ -1,0 +1,15 @@
+# Emulated hardware & BIOS (uses Bochs' built-in $BXSHARE path)
+megs: 32
+romimage: file=$BXSHARE/BIOS-bochs-latest
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+
+# Attach your custom ISO as a CD-ROM on ATA channel 0
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=cdrom, path="zig-out/beesd.iso", status=inserted
+
+# Boot from the CD-ROM
+boot: cdrom
+
+# Optional: Log output and enable the Bochs magic breakpoint (xchg bx, bx)
+log: bochsout.txt
+magic_break: enabled=1
