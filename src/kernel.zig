@@ -1,4 +1,5 @@
 const common = @import("common.zig");
+const serial = @import("serial.zig");
 const tty = @import("tty.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
@@ -63,6 +64,7 @@ noinline fn
 kmain() callconv(.c) noreturn 
 {
 	tty.init();
+	serial.init();
 	print_logo();
 	tty.print("hai :3\n", .{});
 

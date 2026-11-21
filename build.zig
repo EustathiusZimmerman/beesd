@@ -64,7 +64,7 @@ build(b: *std.Build) !void
 	const qemu_raw_cmd = b.addSystemCommand(&[_][]const u8{
 		"qemu-system-x86_64",
 		"-m", "1G",
-		//"-serial", "stdio",
+		"-serial", "stdio",
 	});
 
 	qemu_raw_cmd.addArg("-kernel");
@@ -80,6 +80,7 @@ build(b: *std.Build) !void
 	const qemu_img_cmd = b.addSystemCommand(&[_][]const u8{
 		"qemu-system-x86_64",
 		"-m", "1G",
+		"-serial", "stdio",
 	});
 
 	qemu_img_cmd.addArg("-cdrom");

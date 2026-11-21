@@ -1,4 +1,5 @@
 const std = @import("std");
+const serial = @import("serial.zig");
 
 const VGA_WIDTH = 80;
 const VGA_HEIGHT = 25;
@@ -149,6 +150,7 @@ print_string(str: []const u8) void
 {
 	for(str) |char| {
 		print_char(char);
+		serial.write_char(char);
 	}
 }
 
