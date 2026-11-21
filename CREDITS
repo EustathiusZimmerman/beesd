@@ -1,3 +1,0 @@
-https://wiki.osdev.org/Zig_Bare_Bones - The base of the kernel + tty.zig based off this article
-https://asciiart.website/art/6264 - Bee ASCII art
-https://github.com/ZystemOS/pluto - Suprisingly not much, more of "how this could work", not straight up copying
