@@ -33,11 +33,37 @@ _start() callconv(.naked) noreturn
 	);
 }
 
+fn
+print_logo() void
+{
+	tty.set_color(tty.ColorType.light_brown, tty.ColorType.black);
+	tty.print(
+	\\        ____
+	\\ _--_  /*  *\  _--_
+	\\(    \(      )/    )
+	\\ \__  \)____(/  __/
+	\\ /    /)____(\    \
+	\\(_  _/(______)\_  _)
+	\\  --   \____/   --
+	\\
+	, .{});
+	
+	tty.print("    ", .{});
+	tty.print("{s} kernel\n", .{"BEESD"});
+	for(0..20) |i| {
+		_ = &i;
+		tty.print("=", .{});
+	}
+	tty.print("\n", .{});
+	tty.set_color(tty.ColorType.white, tty.ColorType.black);
+}
+
 noinline fn 
 kmain() callconv(.c) noreturn 
 {
 	tty.init();
-	tty.print("{s} kernel", .{"BEESD"});
+	print_logo();
+	tty.print("hai :3\n", .{});
 
 	while(true) {
 		asm volatile (

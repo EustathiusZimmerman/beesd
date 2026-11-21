@@ -6,7 +6,7 @@ const VGA_SIZE = VGA_WIDTH * VGA_HEIGHT;
 
 var global_row: usize = 0;
 var global_col: usize = 0;
-var global_color: Color = .init(.magenta, .black);
+var global_color: Color = .init(.light_brown, .black);
 var global_buffer = @as([*]volatile u16, @ptrFromInt(0xB8000)); // Address of Video Memory
 
 pub const ColorType = enum(u4) {
@@ -52,7 +52,7 @@ init() void
 }
 
 pub fn 
-set_color(fg: Color, bg: Color) void
+set_color(fg: ColorType, bg: ColorType) void
 {
 	global_color = Color.init(fg, bg);
 }
