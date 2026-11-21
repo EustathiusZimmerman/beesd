@@ -1,5 +1,8 @@
 BEESD
 =====
+[![Repo](https://img.shields.io/badge/codeberg-repo?style=plastic&logo=codeberg&logoColor=white&label=repo&color=%232185D0)](https://codeberg.org/Eustathius/beesd)
+[![License](https://img.shields.io/badge/GPLv3--or--later-license?style=plastic&logo=GPLv3&logoColor=white&label=license&color=%23BD0000)](https://img.shields.io/badge/GPLv3--or--later-license?style=plastic&logo=GPLv3&logoColor=white&label=license&color=%23BD0000)
+
 *BEESD* is a bare-metal 32-bit x86 (IA32) executable larping as a standalone kernel, featuring stuff.
 
 ## Progress
