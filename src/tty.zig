@@ -1,3 +1,6 @@
+// Copyright 2026 - 2026, Eustathius Zimmerman and the BEESD contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 const std = @import("std");
 const serial = @import("serial.zig");
 
