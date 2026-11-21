@@ -1,3 +1,4 @@
+const common = @import("common.zig");
 const tty = @import("tty.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
@@ -33,7 +34,7 @@ _start() callconv(.naked) noreturn
 	);
 }
 
-fn
+inline fn
 print_logo() void
 {
 	tty.set_color(tty.ColorType.light_brown, tty.ColorType.black);
@@ -66,8 +67,6 @@ kmain() callconv(.c) noreturn
 	tty.print("hai :3\n", .{});
 
 	while(true) {
-		asm volatile (
-			\\ hlt
-		);
+		common.halt_cpu();
 	}
 }
