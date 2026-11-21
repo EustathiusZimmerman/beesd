@@ -61,19 +61,34 @@ build(b: *std.Build) !void
 	iso_step.dependOn(&install_iso.step);
 
 	const kernel_path = kernel.getEmittedBin();
-	const qemu_cmd = b.addSystemCommand(&[_][]const u8{
+	const qemu_raw_cmd = b.addSystemCommand(&[_][]const u8{
 		"qemu-system-x86_64",
 		"-m", "1G",
 		//"-serial", "stdio",
 	});
 
-	qemu_cmd.addArg("-kernel");
-	qemu_cmd.addFileArg(kernel_path);
-	qemu_cmd.step.dependOn(b.getInstallStep());
+	qemu_raw_cmd.addArg("-kernel");
+	qemu_raw_cmd.addFileArg(kernel_path);
+	qemu_raw_cmd.step.dependOn(b.getInstallStep());
 
-	const run_cmd = b.addRunArtifact(kernel);
-	run_cmd.step.dependOn(&qemu_cmd.step);
+	const run_raw_cmd = b.addRunArtifact(kernel);
+	run_raw_cmd.step.dependOn(&qemu_raw_cmd.step);
 
-	const run_step = b.step("run", "Run with QEMU");
-	run_step.dependOn(&run_cmd.step);
+	const run_raw_step = b.step("run-raw", "Run the raw kernel with QEMU");
+	run_raw_step.dependOn(&run_raw_cmd.step);
+
+	const qemu_img_cmd = b.addSystemCommand(&[_][]const u8{
+		"qemu-system-x86_64",
+		"-m", "1G",
+	});
+
+	qemu_img_cmd.addArg("-cdrom");
+	qemu_img_cmd.addFileArg(iso_path);
+	qemu_img_cmd.step.dependOn(iso_step);
+
+	const run_img_cmd = b.addRunArtifact(kernel);
+	run_img_cmd.step.dependOn(&qemu_img_cmd.step);
+
+	const run_img_step = b.step("run", "Run the ISO image with GRUB bootloader installed");
+	run_img_step.dependOn(&run_img_cmd.step);
 }
