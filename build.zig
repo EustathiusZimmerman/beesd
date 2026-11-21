@@ -35,6 +35,31 @@ build(b: *std.Build) !void
 	kernel.setLinkerScript(b.path("src/linker.ld"));
 	b.installArtifact(kernel);
 
+	const iso_root = b.addWriteFiles();
+	_ = iso_root.addCopyFile(kernel.getEmittedBin(), "boot/kernel.elf");
+	_ = iso_root.add("boot/grub/grub.cfg",
+		\\set timeout=5
+		\\set default=0
+		\\
+		\\menuentry "BEESD" {
+		\\    multiboot /boot/kernel.elf
+		\\    boot
+		\\}
+		\\
+	);
+
+	const grub_mkrescue = b.addSystemCommand(&[_][]const u8{
+		"grub-mkrescue",
+		"-o",
+	});
+	const iso_path = grub_mkrescue.addOutputFileArg("beesd.iso");
+	grub_mkrescue.addDirectoryArg(iso_root.getDirectory());
+
+	const install_iso = b.addInstallFileWithDir(iso_path, .prefix, "beesd.iso");
+
+	const iso_step = b.step("iso", "Build an ISO image with GRUB bootloader");
+	iso_step.dependOn(&install_iso.step);
+
 	const kernel_path = kernel.getEmittedBin();
 	const qemu_cmd = b.addSystemCommand(&[_][]const u8{
 		"qemu-system-x86_64",
