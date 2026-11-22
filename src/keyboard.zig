@@ -22,9 +22,8 @@ handler() void
 	const scancode = common.inb(PS2_DATA_PORT);
 
 	if(scancode == SPACE_PRESSED) {
-		tty.print("67\n", .{});
-	} else if(scancode == SPACE_RELEASED) {
-		tty.print("69\n", .{});
+		common.disable_interrupts();
+		tty.print("Disabled interruts: Goodbye!\n", .{});
 	}
 
 	common.outb(PIC1_COMMAND, PIC_EOI);

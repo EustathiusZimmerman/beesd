@@ -77,8 +77,14 @@ print_char_at(char: u8, color: Color, x: usize, y: usize) void
 fn 
 check_and_scroll() void 
 {
-	if (global_row == VGA_HEIGHT) {
-		global_row = 0;
+	if (global_row >= VGA_HEIGHT) {
+		for(0..((VGA_HEIGHT - 1) * VGA_WIDTH)) |index| {
+			global_buffer[index] = global_buffer[index + VGA_WIDTH];
+		}
+		for(0..(VGA_WIDTH - 1)) |index| {
+			print_char_at(' ', global_color, index, 24);
+		}
+		global_row = VGA_HEIGHT - 1;
 	}
 }
 

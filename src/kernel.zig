@@ -102,19 +102,22 @@ kmain() callconv(.c) noreturn
 	print_license_notice();
 
 	tty.print("hai :3\n", .{});
+	tty.print("Press Space to disable interrupts (keyboard and timer logic)\n", .{});
 
 	common.enable_interrupts();
 
 	kb.init();
 
-	var timer_seen = false;
+	var timestamp: u32 = 0;
+	var sex: u32 = 0;
 	while (true) {
 		common.halt_cpu();
 
 		// Testing CPU timer, should be removed later
-		if (!timer_seen and pit.get_ticks() == 600) {
-			timer_seen = true;
-			tty.print("Six seconds passed, my shitty code works :D\n", .{});
+		if ((pit.get_ticks() - timestamp) == 100) {
+			sex += 1;
+			timestamp = pit.get_ticks();
+			tty.print("{}\n", .{sex});
 		}
 		kb.handler();
 	}

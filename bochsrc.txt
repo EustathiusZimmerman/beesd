@@ -10,6 +10,9 @@ ata0-master: type=cdrom, path="zig-out/beesd.iso", status=inserted
 # Boot from the CD-ROM
 boot: cdrom
 
+# Fix PIT
+clock: sync=slowdown
+
 # Optional: Log output and enable the Bochs magic breakpoint (xchg bx, bx)
 log: bochsout.txt
 magic_break: enabled=1
