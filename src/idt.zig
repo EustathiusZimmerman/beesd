@@ -6,6 +6,7 @@ const pic = @import("pic.zig");
 const tty = @import("tty.zig");
 const common = @import("common.zig");
 
+/// Struct representation of the IDT
 pub const IdtEntry = packed struct {
 	base_low: u16,
 	selector: u16,
@@ -17,11 +18,13 @@ pub const IdtEntry = packed struct {
 	base_high: u16,
 };
 
+/// Struct representation of the pointer to the IDT
 pub const IdtPtr = packed struct {
 	limit: u16,
 	base: u32,
 };
 
+/// Struct representation of the interrupt frame
 pub const InterruptFrame = extern struct {
 	gs: u32,
 	fs: u32,
@@ -70,6 +73,7 @@ var idt_ptr: IdtPtr = IdtPtr{
 	.base = 0,
 };
 
+/// All of the IDT Entries, all of the properties set to 0 initially
 var idt_entries: [NUMBER_OF_ENTRIES]IdtEntry = @splat(.{
 	.base_low = 0,
 	.selector = 0,
@@ -83,6 +87,7 @@ var idt_entries: [NUMBER_OF_ENTRIES]IdtEntry = @splat(.{
 
 var irq_handlers: [IRQ_COUNT]?IrqHandler = @splat(null);
 
+/// Interrupt exception names
 // Copied from https://en.wikipedia.org/wiki/Interrupt_descriptor_table
 const exception_names: [32][]const u8 = .{
 	"Divide Error",
@@ -119,6 +124,7 @@ const exception_names: [32][]const u8 = .{
 	"Reserved",
 };
 
+/// Sets an IDT entry
 fn 
 set_gate(vector: usize, handler: u32, selector: u16, gate_type: u4, privilege: u2) void 
 {
@@ -134,6 +140,7 @@ set_gate(vector: usize, handler: u32, selector: u16, gate_type: u4, privilege: u
 	};
 }
 
+/// Registers an interrupt request
 pub fn 
 register_irq(irq: u8, handler: IrqHandler) void 
 {
@@ -141,6 +148,7 @@ register_irq(irq: u8, handler: IrqHandler) void
 	irq_handlers[irq] = handler;
 }
 
+/// DeRegisters an interrupt request
 pub fn 
 unregister_irq(irq: u8) void 
 {
@@ -148,6 +156,7 @@ unregister_irq(irq: u8) void
 	irq_handlers[irq] = null;
 }
 
+/// Gets the name of an interrupt exception
 fn 
 exception_name(vector: u32) []const u8 
 {
@@ -157,6 +166,7 @@ exception_name(vector: u32) []const u8
 	return "Unknown";
 }
 
+/// Check whether the interrupt exception has its own error code or not
 fn 
 exception_has_error_code(vector: u32) bool 
 {
@@ -166,6 +176,7 @@ exception_has_error_code(vector: u32) bool
 	};
 }
 
+/// Handles the interrupt exception
 fn 
 handle_exception(frame: *InterruptFrame) void 
 {
@@ -206,6 +217,7 @@ handle_exception(frame: *InterruptFrame) void
 	}
 }
 
+/// Handles a CPU interrupt request
 fn 
 handle_irq(frame: *InterruptFrame) void 
 {
@@ -236,6 +248,7 @@ interrupt_handler(frame: *InterruptFrame) callconv(.c) void
 	tty.print("Unhandled interrupt {}\n", .{frame.vector});
 }
 
+/// Initializes the Interrupt Descriptor Table
 pub fn 
 init() void 
 {

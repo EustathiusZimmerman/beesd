@@ -4,6 +4,7 @@
 const gdt = @import("gdt.zig");
 const idt = @import("idt.zig");
 
+/// Get a byte from a port
 pub fn
 inb(port: u16) u8
 {
@@ -14,6 +15,7 @@ inb(port: u16) u8
 	);
 }
 
+/// Get a word from a port
 pub fn
 inw(port: u16) u16
 {
@@ -24,6 +26,7 @@ inw(port: u16) u16
 	);
 }
 
+/// Get a double word (long) from a port
 pub fn
 inl(port: u16) u32
 {
@@ -34,6 +37,7 @@ inl(port: u16) u32
 	);
 }
 
+/// Send a byte to a port
 pub fn 
 outb(port: u16, data: u8) void 
 {
@@ -45,6 +49,7 @@ outb(port: u16, data: u8) void
 	);
 }
 
+/// Send a word to a port
 pub fn 
 outw(port: u16, data: u16) void 
 {
@@ -56,7 +61,7 @@ outw(port: u16, data: u16) void
 	);
 }
 
-
+/// Send a double word (long) to a port
 pub fn 
 outl(port: u16, data: u32) void 
 {
@@ -75,6 +80,7 @@ io_wait() void
 	outb(0x80, 0);
 }
 
+/// Load a GDT table
 pub fn
 lgdt(pgdt: *const gdt.GdtPtr) void
 {
@@ -96,6 +102,7 @@ lgdt(pgdt: *const gdt.GdtPtr) void
 	);
 }
 
+/// Load the TSS table offset relative to the GDT
 pub fn
 ltr(offset: u16) void {
 	asm volatile(
@@ -106,6 +113,7 @@ ltr(offset: u16) void {
 	);
 }
 
+/// Load an IDT table
 pub fn
 lidt(idt_ptr: *const idt.IdtPtr) void
 {
@@ -117,6 +125,7 @@ lidt(idt_ptr: *const idt.IdtPtr) void
 	);
 }
 
+/// Disable CPU interrupts
 pub fn 
 disable_interrupts() void
 {
@@ -128,6 +137,7 @@ disable_interrupts() void
 	);
 }
 
+/// Enable CPU interrupts
 pub fn 
 enable_interrupts() void
 {
@@ -139,6 +149,7 @@ enable_interrupts() void
 	);
 }
 
+/// Halt the CPU (duh)
 pub fn 
 halt_cpu() void
 {

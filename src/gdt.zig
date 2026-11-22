@@ -5,6 +5,7 @@ const std = @import("std");
 const tty = @import("tty.zig");
 const common = @import("common.zig");
 
+/// Access Bits of a GDT Entry
 const AccessBits = packed struct {
 	accessed: u1,
 	read_write: u1,
@@ -15,6 +16,7 @@ const AccessBits = packed struct {
 	present: u1,
 };
 
+/// Flag Bits of a GDT Entry
 const FlagBits = packed struct {
 	reserved_zero: u1,
 	is_64bit: u1,
@@ -22,6 +24,7 @@ const FlagBits = packed struct {
 	granularity: u1,
 };
 
+/// GDT entry representation (kernel segment code etc)
 const GdtEntry = packed struct {
 	limit_low: u16,
 	base_low: u24,
@@ -31,6 +34,7 @@ const GdtEntry = packed struct {
 	base_high: u8,
 };
 
+/// TSS struct
 const Tss = packed struct {
 prev_tss: u16,
 reserved1: u16,
@@ -124,6 +128,7 @@ trap: u16,
 io_permissions_base_offset: u16,
 }; // Credits to the Pluto kernel, I wouldn't have the patience to document all of ts
 
+/// Pointer to the GDT
 pub const GdtPtr = packed struct {
 	limit: u16, // Num of entries
 	base: u32, // Entry for base addresses
@@ -147,6 +152,7 @@ const USER_DATA_INDEX: u16 = 0x04;
 /// The index of the task state segment GDT entry.
 const TSS_INDEX: u16 = 0x05;
 
+/// Null Segment - All the values should be set to 0
 const NULL_SEGMENT: AccessBits = AccessBits{
 	.accessed             = 0,
 	.read_write           = 0,
@@ -157,6 +163,7 @@ const NULL_SEGMENT: AccessBits = AccessBits{
 	.present              = 0,
 };
 
+/// Kernel Segment Code part of the GDT
 const KERNEL_SEGMENT_CODE: AccessBits = AccessBits{
 	.accessed             = 0,
 	.read_write           = 1,
@@ -167,6 +174,7 @@ const KERNEL_SEGMENT_CODE: AccessBits = AccessBits{
 	.present              = 1,
 };
 
+/// Kernel Segment Data part of the GDT
 const KERNEL_SEGMENT_DATA: AccessBits = AccessBits{
 	.accessed             = 0,
 	.read_write           = 1,
@@ -177,6 +185,7 @@ const KERNEL_SEGMENT_DATA: AccessBits = AccessBits{
 	.present              = 1,
 };
 
+/// User Segment Code part of the GDT
 const USER_SEGMENT_CODE: AccessBits = AccessBits{
 	.accessed             = 0,
 	.read_write           = 1,
@@ -187,6 +196,7 @@ const USER_SEGMENT_CODE: AccessBits = AccessBits{
 	.present              = 1,
 };
 
+/// User Segment Data part of the GDT
 const USER_SEGMENT_DATA: AccessBits = AccessBits{
 	.accessed             = 0,
 	.read_write           = 1,
@@ -197,6 +207,7 @@ const USER_SEGMENT_DATA: AccessBits = AccessBits{
 	.present              = 1,
 };
 
+/// The TSS segment of the GDT
 const TSS_SEGMENT: AccessBits = AccessBits{
 	.accessed             = 1,
 	.read_write           = 0,
@@ -207,6 +218,7 @@ const TSS_SEGMENT: AccessBits = AccessBits{
 	.present              = 1,
 };
 
+/// Null flags
 const NULL_FLAGS: FlagBits = FlagBits{
 	.reserved_zero = 0,
 	.is_64bit      = 0,
@@ -214,6 +226,7 @@ const NULL_FLAGS: FlagBits = FlagBits{
 	.granularity   = 0,
 };
 
+/// Flags for 32 bit paging
 const PAGING_32_BIT: FlagBits = FlagBits{
 	.reserved_zero = 0,
 	.is_64bit      = 0,
@@ -241,8 +254,11 @@ pub const TSS_OFFSET: u16 = 0x28;
 
 const NUMBER_OF_ENTRIES: u16 = 0x06;
 
+/// Size of the GDT
+// GDT entries array starts from 0, because of that we deincrement 1 from the number of entries
 const TABLE_SIZE: u16 = @sizeOf(GdtEntry) * NUMBER_OF_ENTRIES - 1;
 
+/// Array contraining the info of the entirety of GDT
 var gdt_entries: [NUMBER_OF_ENTRIES]GdtEntry = init: {
 	var gdt_entries_temp: [NUMBER_OF_ENTRIES]GdtEntry = undefined;
 
@@ -273,6 +289,7 @@ pub var main_tss_entry: Tss = init: {
 	break :init tss_temp;
 };
 
+/// Makes a GDT entry: Takes in the GDT entry properties and returns an GdtEntry struct
 fn 
 make_gdt_entry(base: u32, limit: u20, access: AccessBits, flags: FlagBits) GdtEntry 
 {
@@ -299,6 +316,7 @@ make_gdt_entry(base: u32, limit: u20, access: AccessBits, flags: FlagBits) GdtEn
 	};
 }
 
+/// Initializes the GDT
 pub fn
 init() void
 {
