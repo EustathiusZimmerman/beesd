@@ -39,30 +39,30 @@ const Color = packed struct(u8) {
 	pub fn 
 	init(fg: ColorType, bg: ColorType) Color 
 	{
-		return .{.fg = fg, .bg = bg};
+		return .{ .fg = fg, .bg = bg };
 	}
 
-	pub fn
+	pub fn 
 	get_vga_char(self: Color, char: u8) u16 
 	{
 		return @as(u16, @as(u8, @bitCast(self))) << 8 | char;
 	}
 };
 
-pub fn
+pub fn 
 init() void 
 {
 	clear();
 }
 
 pub fn 
-set_color(fg: ColorType, bg: ColorType) void
+set_color(fg: ColorType, bg: ColorType) void 
 {
 	global_color = Color.init(fg, bg);
 }
 
-pub fn
-clear() void
+pub fn 
+clear() void 
 {
 	@memset(global_buffer[0..VGA_SIZE], Color.get_vga_char(global_color, ' '));
 }
@@ -77,15 +77,15 @@ print_char_at(char: u8, color: Color, x: usize, y: usize) void
 fn 
 check_and_scroll() void 
 {
-	if(global_row == VGA_HEIGHT) {
+	if (global_row == VGA_HEIGHT) {
 		global_row = 0;
 	}
 }
 
-pub fn
+pub fn 
 print_char(char: u8) void 
 {
-	switch(char) {
+	switch (char) {
 		'\n' => {
 			global_col = 0;
 			global_row += 1;
@@ -94,7 +94,7 @@ print_char(char: u8) void
 		else => {
 			print_char_at(char, global_color, global_col, global_row);
 			global_col += 1;
-			if(global_col == VGA_WIDTH) {
+			if (global_col == VGA_WIDTH) {
 				global_col = 0;
 				global_row += 1;
 				check_and_scroll();
@@ -104,7 +104,7 @@ print_char(char: u8) void
 }
 
 /// Implementation of std.Io.Writer.vtable.drain function
-fn
+fn 
 drain(w: *std.Io.Writer, data: []const []const u8, splat: usize) !usize 
 {
 	std.debug.assert(data.len != 0);
@@ -113,20 +113,20 @@ drain(w: *std.Io.Writer, data: []const []const u8, splat: usize) !usize
 	const pattern = data[data.len - 1];
 	const splat_len = pattern.len * splat;
 
-	if(w.end != 0) {
+	if (w.end != 0) {
 		print_string(w.buffered());
 		w.end = 0;
 	}
 
-	for(data[0 .. data.len - 1]) |bytes| {
+	for (data[0 .. data.len - 1]) |bytes| {
 		print_string(bytes);
 		consumed += bytes.len;
 	}
 
-	switch(pattern.len) {
+	switch (pattern.len) {
 		0 => {},
 		else => {
-			for(0..splat) |_| {
+			for (0..splat) |_| {
 				print_string(pattern);
 			}
 		},
@@ -136,7 +136,7 @@ drain(w: *std.Io.Writer, data: []const []const u8, splat: usize) !usize
 	return consumed;
 }
 
-pub fn
+pub fn 
 writer(buffer: []u8) std.Io.Writer 
 {
 	return .{
@@ -148,17 +148,17 @@ writer(buffer: []u8) std.Io.Writer
 	};
 }
 
-pub fn
-print_string(str: []const u8) void
+pub fn 
+print_string(str: []const u8) void 
 {
-	for(str) |char| {
+	for (str) |char| {
 		print_char(char);
 		serial.write_char(char);
 	}
 }
 
 pub fn 
-print(comptime fmt: []const u8, args: anytype) void
+print(comptime fmt: []const u8, args: anytype) void 
 {
 	var w = writer(&.{});
 	w.print(fmt, args) catch return;

@@ -61,47 +61,48 @@ pub fn
 outl(port: u16, data: u32) void 
 {
 	asm volatile (
-		\\ outw %[data], %[port]
+		\\ outl %[data], %[port]
 		:
 		: [port] "{dx}" (port),
 		  [data] "{eax}" (data),
 	);
 }
 
+/// Write to an unused I/O port to give older devices time to react.
+pub fn
+io_wait() void
+{
+	outb(0x80, 0);
+}
+
 pub fn
 lgdt(pgdt: *const gdt.GdtPtr) void
 {
-	// Load gdt into CPU
-	asm volatile(
-		\\ lgdt (%%eax)
+	// Load the GDT and all data segments, then reload CS with a far jump.
+	asm volatile (
+		\\ lgdt (%[pgdt])
+		\\ movw %[data_selector], %%ds
+		\\ movw %[data_selector], %%es
+		\\ movw %[data_selector], %%fs
+		\\ movw %[data_selector], %%gs
+		\\ movw %[data_selector], %%ss
+		\\ ljmp %[code_selector], $1f
+		\\ 1:
 		:
 		: [pgdt] "{eax}" (pgdt),
-	);
-
-	// Load the kernel data segment
-	asm volatile(
-		\\ mov %%bx, %%ds
-		:
-		: [KERNEL_DATA_OFFSET] "{bx}" (gdt.KERNEL_DATA_OFFSET),
-	);
-
-	asm volatile ("mov %%bx, %%es");
-	asm volatile ("mov %%bx, %%fs");
-	asm volatile ("mov %%bx, %%gs");
-	asm volatile ("mov %%bx, %%ss");
-
-	asm volatile (
-		\\ ljmp $0x08, $1f
-		\\ 1:
+		  [data_selector] "{bx}" (gdt.KERNEL_DATA_OFFSET),
+		  [code_selector] "i" (gdt.KERNEL_CODE_OFFSET),
+		: .{ .memory = true }
 	);
 }
 
 pub fn
 ltr(offset: u16) void {
 	asm volatile(
-		\\ ltr %%ax
+		\\ ltr %[offset]
 		:
 		: [offset] "{ax}" (offset),
+		: .{ .memory = true }
 	);
 }
 
@@ -109,9 +110,10 @@ pub fn
 lidt(idt_ptr: *const idt.IdtPtr) void
 {
 	asm volatile(
-		\\ lidt (%%eax)
+		\\ lidt (%[idt_ptr])
 		:
 		: [idt_ptr] "{eax}" (idt_ptr),
+		: .{ .memory = true }
 	);
 }
 
@@ -120,6 +122,9 @@ disable_interrupts() void
 {
 	asm volatile (
 		\\ cli
+		:
+		:
+		: .{ .memory = true }
 	);
 }
 
@@ -128,6 +133,9 @@ enable_interrupts() void
 {
 	asm volatile (
 		\\ sti
+		:
+		:
+		: .{ .memory = true }
 	);
 }
 

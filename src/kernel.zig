@@ -6,6 +6,8 @@ const serial = @import("serial.zig");
 const tty = @import("tty.zig");
 const idt = @import("idt.zig");
 const gdt = @import("gdt.zig");
+const pic = @import("pic.zig");
+const pit = @import("pit.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
 const MULTIBOOT_FLAG_ALIGN = 1 << 0;
@@ -13,10 +15,10 @@ const MULTIBOOT_FLAG_MEMINFO = 1 << 1;
 const FLAGS = MULTIBOOT_FLAG_ALIGN | MULTIBOOT_FLAG_MEMINFO;
 
 const MultibootHeader = packed struct(u128) {
-	magic:    u32 = MULTIBOOT_HEADER_MAGIC,
-	flags:    u32 = FLAGS,
+	magic: u32 = MULTIBOOT_HEADER_MAGIC,
+	flags: u32 = FLAGS,
 	checksum: u32,
-	padding:  u32 = 0,
+	padding: u32 = 0,
 };
 
 export var multiboot: MultibootHeader align(4) linksection(".multiboot") = .{
@@ -40,29 +42,43 @@ _start() callconv(.naked) noreturn
 	);
 }
 
-inline fn
-print_logo() void
+inline fn 
+print_logo() void 
 {
 	tty.set_color(tty.ColorType.light_brown, tty.ColorType.black);
 	tty.print(
-	\\        ____
-	\\ _--_  /*  *\  _--_
-	\\(    \(      )/    )
-	\\ \__  \)____(/  __/
-	\\ /    /)____(\    \
-	\\(_  _/(______)\_  _)
-	\\  --   \____/   --
-	\\
+		\\        ____
+		\\ _--_  /*  *\  _--_
+		\\(    \(      )/    )
+		\\ \__  \)____(/  __/
+		\\ /    /)____(\    \
+		\\(_  _/(______)\_  _)
+		\\  --   \____/   --
+		\\
 	, .{});
-	
+
 	tty.print("    ", .{});
 	tty.print("{s} kernel\n", .{"BEESD"});
-	for(0..20) |i| {
+	for (0..20) |i| {
 		_ = &i;
 		tty.print("=", .{});
 	}
 	tty.print("\n", .{});
 	tty.set_color(tty.ColorType.white, tty.ColorType.black);
+}
+
+inline fn
+print_license_notice() void
+{
+	tty.set_color(tty.ColorType.light_red, tty.ColorType.black);
+	tty.print("WARNING: ", .{});
+	tty.set_color(tty.ColorType.white, tty.ColorType.black);
+	tty.print(
+		\\This program comes with ABSOLUTELY NO WARRANTY
+		\\This is free software that is distributed under the terms of the GNU GPL v.3.0
+		\\You should have recieved the text of it with your copy of the program
+		\\
+	, .{});
 }
 
 noinline fn 
@@ -76,14 +92,26 @@ kmain() callconv(.c) noreturn
 	gdt.init();
 	idt.init();
 
-	tty.print("hai :3\n", .{});
-	tty.print(
-		\\This program comes with ABSOLUTELY NO WARRANTY
-		\\This is free software that is distributed under the terms of the GNU GPL v.3.0
-		\\You should have recieved the text of it with your copy of the program
-		, .{});
+	pic.remap(idt.IRQ_BASE, idt.IRQ_BASE + 8);
+	pic.mask_all();
 
-	while(true) {
+	pit.init(100);
+	pic.unmask(0);
+
+	print_license_notice();
+
+	tty.print("hai :3\n", .{});
+
+	common.enable_interrupts();
+
+	var timer_seen = false;
+	while (true) {
 		common.halt_cpu();
+
+		// Testing CPU timer, should be removed later
+		if (!timer_seen and pit.get_ticks() != 0) {
+			timer_seen = true;
+			tty.print("Timer interrupt received, my shitty code works :D\n", .{});
+		}
 	}
 }

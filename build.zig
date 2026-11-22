@@ -3,11 +3,9 @@
 
 const std = @import("std");
 
-pub fn 
-build(b: *std.Build) !void 
-{
+pub fn build(b: *std.Build) !void {
 	const optimize = b.standardOptimizeOption(.{});
-	
+
 	const Target = std.Target.x86;
 	const target = b.resolveTargetQuery(.{
 		.cpu_arch = .x86,
@@ -17,10 +15,10 @@ build(b: *std.Build) !void
 			.soft_float,
 		}),
 		.cpu_features_sub = Target.featureSet(&.{
-			.avx, 
-			.avx2, 
-			.sse, 
-			.sse2, 
+			.avx,
+			.avx2,
+			.sse,
+			.sse2,
 			.mmx,
 		}),
 	});
@@ -35,6 +33,7 @@ build(b: *std.Build) !void
 		}),
 	});
 
+	kernel.root_module.addAssemblyFile(b.path("src/interrupts.S"));
 	kernel.setLinkerScript(b.path("src/linker.ld"));
 	b.installArtifact(kernel);
 
@@ -45,8 +44,8 @@ build(b: *std.Build) !void
 		\\set default=0
 		\\
 		\\menuentry "BEESD" {
-		\\    multiboot /boot/kernel.elf
-		\\    boot
+		\\	multiboot /boot/kernel.elf
+		\\	boot
 		\\}
 		\\
 	);
@@ -66,8 +65,10 @@ build(b: *std.Build) !void
 	const kernel_path = kernel.getEmittedBin();
 	const qemu_raw_cmd = b.addSystemCommand(&[_][]const u8{
 		"qemu-system-x86_64",
-		"-m", "1G",
-		"-serial", "stdio",
+		"-m",
+		"1G",
+		"-serial",
+		"stdio",
 	});
 
 	qemu_raw_cmd.addArg("-kernel");
@@ -82,8 +83,10 @@ build(b: *std.Build) !void
 
 	const qemu_img_cmd = b.addSystemCommand(&[_][]const u8{
 		"qemu-system-x86_64",
-		"-m", "1G",
-		"-serial", "stdio",
+		"-m",
+		"1G",
+		"-serial",
+		"stdio",
 	});
 
 	qemu_img_cmd.addArg("-cdrom");

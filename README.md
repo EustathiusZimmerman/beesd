@@ -11,7 +11,8 @@ BEESD
  - [x] VGA output (no scrolling yet)
  - [x] Serial support
  - [x] GDT/TSS
- - [x] IDT
+ - [x] IDT and interrupt handling (PIC/PIT)
+ - [ ] MISC: Limine bootloader option
  - [ ] Keyboard support via PS/2
  - [ ] Usermode
  - [ ] ...
@@ -28,7 +29,7 @@ BEESD
 ## Credits
  - [Zig Bare Bones](https://wiki.osdev.org/Zig_Bare_Bones) - The base of the kernel + tty.zig based off this article
  - [Bee ASCII art](https://asciiart.website/art/6264)  by [MrPotatoMan](https://asciiart.website/artist.php?artist_id=735) - Used in `src/kernel.zig`
- - [Pluto Kernel](https://github.com/ZystemOS/pluto) - 99.99% of `src/gdt.zig`
+ - [Pluto Kernel](https://github.com/ZystemOS/pluto) - 99.99% of `src/gdt.zig`, parts of the interrupt code
 
 ## Miscellaneous 
 ### Why is it called BEESD

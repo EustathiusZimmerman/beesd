@@ -6,8 +6,8 @@ const common = @import("common.zig");
 const COM1: u16 = 0x3F8;
 const BAUD_DIVISOR: u16 = 1; // 115200 baud
 
-pub fn
-init() void
+pub fn 
+init() void 
 {
 	common.outb(COM1 + 1, 0x00); // Disable interrupts
 	common.outb(COM1 + 3, 0x80); // Enable DLAB (set baud rate divisor)
@@ -18,26 +18,26 @@ init() void
 	common.outb(COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
 }
 
-pub fn
-write_char(char: u8) void
+pub fn 
+write_char(char: u8) void 
 {
-	if(char == '\n') {
-		write_raw('\r');
+	if (char == '\n') {
+	    write_raw('\r');
 	}
 	write_raw(char);
 }
 
-pub fn
-write_string(str: []const u8) void
+pub fn 
+write_string(str: []const u8) void 
 {
-	for(str) |char| {
+	for (str) |char| {
 		write_char(char);
 	}
 }
 
-fn
-write_raw(char: u8) void
+fn 
+write_raw(char: u8) void 
 {
-	while((common.inb(COM1 + 5) & 0x20) == 0) {}
+	while ((common.inb(COM1 + 5) & 0x20) == 0) {}
 	common.outb(COM1, char);
 }
