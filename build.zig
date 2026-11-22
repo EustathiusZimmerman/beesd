@@ -44,8 +44,8 @@ pub fn build(b: *std.Build) !void {
 		\\set default=0
 		\\
 		\\menuentry "BEESD" {
-		\\	multiboot /boot/kernel.elf
-		\\	boot
+		\\  multiboot /boot/kernel.elf
+		\\  boot
 		\\}
 		\\
 	);
