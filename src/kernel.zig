@@ -8,6 +8,7 @@ const idt = @import("idt.zig");
 const gdt = @import("gdt.zig");
 const pic = @import("pic.zig");
 const pit = @import("pit.zig");
+const kb = @import("keyboard.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
 const MULTIBOOT_FLAG_ALIGN = 1 << 0;
@@ -104,6 +105,8 @@ kmain() callconv(.c) noreturn
 
 	common.enable_interrupts();
 
+	kb.init();
+
 	var timer_seen = false;
 	while (true) {
 		common.halt_cpu();
@@ -113,5 +116,6 @@ kmain() callconv(.c) noreturn
 			timer_seen = true;
 			tty.print("Timer interrupt received, my shitty code works :D\n", .{});
 		}
+		kb.handler();
 	}
 }
