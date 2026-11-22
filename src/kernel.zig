@@ -112,9 +112,9 @@ kmain() callconv(.c) noreturn
 		common.halt_cpu();
 
 		// Testing CPU timer, should be removed later
-		if (!timer_seen and pit.get_ticks() != 0) {
+		if (!timer_seen and pit.get_ticks() == 600) {
 			timer_seen = true;
-			tty.print("Timer interrupt received, my shitty code works :D\n", .{});
+			tty.print("Six seconds passed, my shitty code works :D\n", .{});
 		}
 		kb.handler();
 	}
