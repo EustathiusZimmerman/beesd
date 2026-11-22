@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 const gdt = @import("gdt.zig");
+const idt = @import("idt.zig");
 
 pub fn
 inb(port: u16) u8
@@ -101,6 +102,16 @@ ltr(offset: u16) void {
 		\\ ltr %%ax
 		:
 		: [offset] "{ax}" (offset),
+	);
+}
+
+pub fn
+lidt(idt_ptr: *const idt.IdtPtr) void
+{
+	asm volatile(
+		\\ lidt (%%eax)
+		:
+		: [idt_ptr] "{eax}" (idt_ptr),
 	);
 }
 
