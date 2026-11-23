@@ -13,7 +13,7 @@
  - [x] GDT/TSS
  - [x] IDT and interrupt handling (PIC/PIT)
  - [ ] MISC: Limine bootloader option
- - [ ] Keyboard support via PS/2
+ - [x] Keyboard support via PS/2
  - [ ] Usermode
  - [ ] ...
 
