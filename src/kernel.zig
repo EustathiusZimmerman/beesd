@@ -102,7 +102,8 @@ kmain() callconv(.c) noreturn
 	print_license_notice();
 
 	tty.print("hai :3\n", .{});
-	tty.print("Press any key to print it scancode\n", .{});
+	tty.print("Press any key...\n", .{});
+	tty.print("Press \"Home\" to switch between echoing a key and its scancode\n", .{});
 	
 	kb.init();
 

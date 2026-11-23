@@ -5,6 +5,7 @@ const common = @import("common.zig");
 const idt = @import("idt.zig");
 const pic = @import("pic.zig");
 const tty = @import("tty.zig");
+const std = @import("std");
 
 const PS2_DATA_PORT: u16 = 0x60;
 const PS2_STATUS_PORT: u16 = 0x64;
@@ -163,6 +164,7 @@ var head: usize = 0;
 var tail: usize = 0;
 
 var extended: bool = false;
+var minimal: bool = true;
 
 fn
 read_data() ?u8 
@@ -222,6 +224,23 @@ drain() void
 		const state = if((event.scancode & SCANCODE_RELEASE) != 0) "released" else "pressed";
 		const kind = if(event.extended) "extended, " else "";
 
-		tty.print("scancode 0x{x:0>2}: {s} ({s}{s})\n", .{ event.scancode, key_name(event), kind, state });
+		if((event.scancode & SCANCODE_RELEASE) != 0) {
+			minimal = if((std.mem.eql(u8, key_name(event), "Home"))) !minimal else minimal;
+		}
+
+		if(minimal) {
+			if((event.scancode & SCANCODE_RELEASE) != 0) {
+				if(std.mem.eql(u8, key_name(event), "Space")) {
+					tty.print(" ", .{});
+				} else if(std.mem.eql(u8, key_name(event), "Enter")) {
+					tty.print("\n", .{});
+				} else {
+					tty.print("{s}", .{key_name(event)});
+				}
+			}
+		} else {
+			tty.print("scancode 0x{x:0>2}: {s} ({s}{s})\n", .{ event.scancode, key_name(event), kind, state });
+		}
+
 	}
 }
