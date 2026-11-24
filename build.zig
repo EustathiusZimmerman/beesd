@@ -39,7 +39,21 @@ pub fn build(b: *std.Build) !void {
 
 	const iso_root = b.addWriteFiles();
 	_ = iso_root.addCopyFile(kernel.getEmittedBin(), "boot/kernel.elf");
+	// GRUB's PNG reader only supports non-interlaced images.
+	_ = iso_root.addCopyFile(b.path("assets/banner.png"), "grub/beesd.png");
 	_ = iso_root.add("boot/grub/grub.cfg",
+		\\insmod all_video
+		\\insmod png
+		\\insmod font
+		\\insmod gfxterm
+		\\insmod gfxterm_background
+		\\
+		\\set gfxmode=auto
+		\\loadfont /boot/grub/fonts/unicode.pf2
+		\\terminal_output gfxterm
+		\\
+		\\background_image /grub/beesd.png
+		\\
 		\\set timeout=5
 		\\set default=0
 		\\
