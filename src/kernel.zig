@@ -9,6 +9,8 @@ const gdt = @import("gdt.zig");
 const pic = @import("pic.zig");
 const pit = @import("pit.zig");
 const kb = @import("keyboard.zig");
+const multiboot = @import("multiboot.zig");
+const memory = @import("memory.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
 const MULTIBOOT_FLAG_ALIGN = 1 << 0;
@@ -22,7 +24,7 @@ const MultibootHeader = packed struct(u128) {
 	padding: u32 = 0,
 };
 
-export var multiboot: MultibootHeader align(4) linksection(".multiboot") = .{
+export var multiboot_header: MultibootHeader align(4) linksection(".multiboot") = .{
 	.checksum = ~@as(u32, (MULTIBOOT_HEADER_MAGIC + FLAGS)) + 1,
 };
 
@@ -36,6 +38,9 @@ _start() callconv(.naked) noreturn
 	asm volatile (
 		\\ movl %[stack_top], %%esp
 		\\ movl %%esp, %%ebp
+		\\ subl $8, %%esp
+		\\ pushl %%ebx
+		\\ pushl %%eax
 		\\ call %[kmain:P]
 		:
 		: [stack_top] "i" (stack_bytes[stack_bytes.len..].ptr),
@@ -82,13 +87,34 @@ print_license_notice() void
 	, .{});
 }
 
+inline fn
+multiboot_dump(magic: u32, mbi_address: u32) void
+{
+	if (multiboot.init(magic, mbi_address)) {
+		multiboot.printInfo();
+	} else {
+		tty.set_color(.light_red, .black);
+		tty.print("WARNING: invalid Multiboot handoff (magic 0x{x})\n", .{magic});
+		tty.set_color(.white, .black);
+	}
+
+	const kernel = memory.bounds();
+	tty.print("Kernel image: 0x{x} - 0x{x} ({} KiB)\n", .{
+		kernel.start,
+		kernel.end,
+		kernel.size() / 1024,
+	});
+}
+
 noinline fn 
-kmain() callconv(.c) noreturn 
+kmain(magic: u32, mbi_address: u32) callconv(.c) noreturn 
 {
 	serial.init();
 	tty.init();
 
 	print_logo();
+
+	multiboot_dump(magic, mbi_address);
 
 	gdt.init();
 	idt.init();

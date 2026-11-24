@@ -157,3 +157,120 @@ halt_cpu() void
 		\\ hlt
 	);
 }
+
+/// Read control register 0
+pub fn
+read_cr0() u32
+{
+	return asm volatile (
+		\\ movl %%cr0, %[ret]
+		: [ret] "=r" (-> u32),
+	);
+}
+
+/// Write control register 0
+pub fn
+write_cr0(value: u32) void
+{
+	asm volatile (
+		\\ movl %[value], %%cr0
+		:
+		: [value] "r" (value),
+		: .{ .memory = true }
+	);
+}
+
+/// Read control register 2 (the faulting address after a page fault)
+pub fn
+read_cr2() u32
+{
+	return asm volatile (
+		\\ movl %%cr2, %[ret]
+		: [ret] "=r" (-> u32),
+	);
+}
+
+/// Read control register 3 (the page directory base)
+pub fn
+read_cr3() u32
+{
+	return asm volatile (
+		\\ movl %%cr3, %[ret]
+		: [ret] "=r" (-> u32),
+	);
+}
+
+/// Write control register 3 (the page directory base)
+pub fn
+write_cr3(value: u32) void
+{
+	asm volatile (
+		\\ movl %[value], %%cr3
+		:
+		: [value] "r" (value),
+		: .{ .memory = true }
+	);
+}
+
+/// Read control register 4
+pub fn
+read_cr4() u32
+{
+	return asm volatile (
+		\\ movl %%cr4, %[ret]
+		: [ret] "=r" (-> u32),
+	);
+}
+
+/// Write control register 4
+pub fn
+write_cr4(value: u32) void
+{
+	asm volatile (
+		\\ movl %[value], %%cr4
+		:
+		: [value] "r" (value),
+		: .{ .memory = true }
+	);
+}
+
+/// Invalidate a single TLB entry for a virtual address
+pub fn
+invlpg(address: usize) void
+{
+	asm volatile (
+		\\ invlpg (%[address])
+		:
+		: [address] "r" (address),
+		: .{ .memory = true }
+	);
+}
+
+/// Save the interrupt flag and disable interrupts
+pub fn
+irq_save() usize
+{
+	return asm volatile (
+		\\ pushfl
+		\\ popl %[ret]
+		\\ cli
+		: [ret] "=r" (-> usize),
+		:
+		: .{ .memory = true }
+	);
+}
+
+/// Restore the interrupt flag that was saved previously
+pub fn
+irq_restore(flags: usize) void
+{
+	asm volatile (
+		\\ testl $0x200, %[flags]
+		\\ jz 1f
+		\\ sti
+		\\ 1:
+		:
+		: [flags] "r" (flags),
+		: .{ .memory = true }
+	);
+}
