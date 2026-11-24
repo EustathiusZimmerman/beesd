@@ -2,11 +2,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 const std = @import("std");
+const common = @import("common.zig");
 const serial = @import("serial.zig");
 
 const VGA_WIDTH = 80;
 const VGA_HEIGHT = 25;
 const VGA_SIZE = VGA_WIDTH * VGA_HEIGHT;
+
+const CRTC_INDEX_PORT: u16 = 0x3D4;
+const CRTC_DATA_PORT: u16 = 0x3D5;
+
+const CURSOR_LOCATION_HIGH: u8 = 0x0E;
+const CURSOR_LOCATION_LOW: u8 = 0x0F;
 
 var global_row: usize = 0;
 var global_col: usize = 0;
@@ -55,6 +62,19 @@ init() void
 	clear();
 }
 
+/// Move the hardware cursor to the current typing position
+fn
+update_cursor() void 
+{
+	const position: u16 = @intCast(global_row * VGA_WIDTH + global_col);
+
+	common.outb(CRTC_INDEX_PORT, CURSOR_LOCATION_HIGH);
+	common.outb(CRTC_DATA_PORT, @intCast((position >> 8) & 0xFF));
+
+	common.outb(CRTC_INDEX_PORT, CURSOR_LOCATION_LOW);
+	common.outb(CRTC_DATA_PORT, @intCast(position & 0xFF));
+}
+
 pub fn 
 set_color(fg: ColorType, bg: ColorType) void 
 {
@@ -65,6 +85,7 @@ pub fn
 clear() void 
 {
 	@memset(global_buffer[0..VGA_SIZE], Color.get_vga_char(global_color, ' '));
+	update_cursor();
 }
 
 pub fn 
@@ -107,6 +128,8 @@ print_char(char: u8) void
 			}
 		},
 	}
+
+	update_cursor();
 }
 
 /// Implementation of std.Io.Writer.vtable.drain function

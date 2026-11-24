@@ -229,7 +229,7 @@ drain() void
 		}
 
 		if(minimal) {
-			if((event.scancode & SCANCODE_RELEASE) != 0) {
+			if((event.scancode & SCANCODE_RELEASE) == 0) {
 				if(std.mem.eql(u8, key_name(event), "Space")) {
 					tty.print(" ", .{});
 				} else if(std.mem.eql(u8, key_name(event), "Enter")) {
