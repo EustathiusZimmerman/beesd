@@ -68,10 +68,15 @@ pub fn build(b: *std.Build) !void {
 		"grub-mkrescue",
 		"-o",
 	});
-	const iso_path = grub_mkrescue.addOutputFileArg("beesd.iso");
+	const git_hash_raw = b.run(&.{"git", "rev-parse", "--short", "HEAD"});
+	const git_hash = std.mem.trim(u8, git_hash_raw, &std.ascii.whitespace);
+
+	var buf: [64] u8 = undefined;
+	const iso_name = try std.fmt.bufPrint(&buf, "beesd-{s}-{s}.iso", .{@tagName(target.result.cpu.arch), git_hash});
+	const iso_path = grub_mkrescue.addOutputFileArg(iso_name);
 	grub_mkrescue.addDirectoryArg(iso_root.getDirectory());
 
-	const install_iso = b.addInstallFileWithDir(iso_path, .prefix, "beesd.iso");
+	const install_iso = b.addInstallFileWithDir(iso_path, .prefix, iso_name);
 
 	const iso_step = b.step("iso", "Build an ISO image with GRUB bootloader");
 	iso_step.dependOn(&install_iso.step);
