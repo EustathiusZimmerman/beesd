@@ -65,7 +65,7 @@ print_logo() void
 
 	tty.print("    ", .{});
 	tty.print("{s} kernel\n", .{"BEESD"});
-	for (0..20) |i| {
+	for(0..20) |i| {
 		_ = &i;
 		tty.print("=", .{});
 	}
@@ -90,7 +90,7 @@ print_license_notice() void
 inline fn
 multiboot_dump(magic: u32, mbi_address: u32) void
 {
-	if (multiboot.init(magic, mbi_address)) {
+	if(multiboot.init(magic, mbi_address)) {
 		multiboot.printInfo();
 	} else {
 		tty.set_color(.light_red, .black);
@@ -135,7 +135,7 @@ kmain(magic: u32, mbi_address: u32) callconv(.c) noreturn
 
 	common.enable_interrupts();
 
-	while (true) {
+	while(true) {
 		common.halt_cpu();
 		kb.drain();
 	}

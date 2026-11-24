@@ -98,7 +98,7 @@ print_char_at(char: u8, color: Color, x: usize, y: usize) void
 fn 
 check_and_scroll() void 
 {
-	if (global_row >= VGA_HEIGHT) {
+	if(global_row >= VGA_HEIGHT) {
 		for(0..((VGA_HEIGHT - 1) * VGA_WIDTH)) |index| {
 			global_buffer[index] = global_buffer[index + VGA_WIDTH];
 		}
@@ -121,7 +121,7 @@ print_char(char: u8) void
 		else => {
 			print_char_at(char, global_color, global_col, global_row);
 			global_col += 1;
-			if (global_col == VGA_WIDTH) {
+			if(global_col == VGA_WIDTH) {
 				global_col = 0;
 				global_row += 1;
 				check_and_scroll();
@@ -142,17 +142,17 @@ drain(w: *std.Io.Writer, data: []const []const u8, splat: usize) !usize
 	const pattern = data[data.len - 1];
 	const splat_len = pattern.len * splat;
 
-	if (w.end != 0) {
+	if(w.end != 0) {
 		print_string(w.buffered());
 		w.end = 0;
 	}
 
-	for (data[0 .. data.len - 1]) |bytes| {
+	for(data[0 .. data.len - 1]) |bytes| {
 		print_string(bytes);
 		consumed += bytes.len;
 	}
 
-	switch (pattern.len) {
+	switch(pattern.len) {
 		0 => {},
 		else => {
 			for (0..splat) |_| {
@@ -180,7 +180,7 @@ writer(buffer: []u8) std.Io.Writer
 pub fn 
 print_string(str: []const u8) void 
 {
-	for (str) |char| {
+	for(str) |char| {
 		print_char(char);
 		serial.write_char(char);
 	}

@@ -21,7 +21,7 @@ init() void
 pub fn 
 write_char(char: u8) void 
 {
-	if (char == '\n') {
+	if(char == '\n') {
 	    write_raw('\r');
 	}
 	write_raw(char);
@@ -30,7 +30,7 @@ write_char(char: u8) void
 pub fn 
 write_string(str: []const u8) void 
 {
-	for (str) |char| {
+	for(str) |char| {
 		write_char(char);
 	}
 }
@@ -38,6 +38,6 @@ write_string(str: []const u8) void
 fn 
 write_raw(char: u8) void 
 {
-	while ((common.inb(COM1 + 5) & 0x20) == 0) {}
+	while((common.inb(COM1 + 5) & 0x20) == 0) {}
 	common.outb(COM1, char);
 }

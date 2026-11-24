@@ -72,10 +72,10 @@ pub const MmapEntry = packed struct {
 };
 
 comptime {
-	if (@sizeOf(Info) != 116) {
+	if(@sizeOf(Info) != 116) {
 		@compileError("Multiboot info must be exactly 116 bytes");
 	}
-	if (@sizeOf(MmapEntry) != 24) {
+	if(@sizeOf(MmapEntry) != 24) {
 		@compileError("Multiboot memory map entry must be exactly 24 bytes");
 	}
 }
@@ -94,8 +94,9 @@ pub const MemoryType = enum(u32) {
 pub var info: ?*const Info = null;
 
 /// Validate the bootloader handoff and remember where the info structure is
-pub fn init(magic: u32, address: u32) bool {
-	if (magic != BOOTLOADER_MAGIC or address == 0) return false;
+pub fn 
+init(magic: u32, address: u32) bool {
+	if(magic != BOOTLOADER_MAGIC or address == 0) return false;
 	info = @ptrFromInt(@as(usize, address));
 	return true;
 }
@@ -106,13 +107,13 @@ pub const MmapIterator = struct {
 	remaining: u32,
 
 	pub fn next(self: *MmapIterator) ?MmapEntry {
-		if (self.remaining < @sizeOf(MmapEntry)) return null;
+		if(self.remaining < @sizeOf(MmapEntry)) return null;
 
 		const entry: *const MmapEntry = @ptrCast(@alignCast(self.cursor));
-		if (entry.size < 20) return null;
+		if(entry.size < 20) return null;
 
 		const step = std.math.add(u32, entry.size, @sizeOf(u32)) catch return null;
-		if (step > self.remaining) return null;
+		if(step > self.remaining) return null;
 
 		self.cursor += @as(usize, step);
 		self.remaining -= step;
@@ -121,7 +122,8 @@ pub const MmapIterator = struct {
 };
 
 /// Returns an iterator over the memory map or null
-pub fn mmapIterator() ?MmapIterator {
+pub fn 
+mmapIterator() ?MmapIterator {
 	const inf = info orelse return null;
 	if (inf.flags & FLAG_MMAP == 0) return null;
 	if (inf.mmap_addr == 0 or inf.mmap_length == 0) return null;
@@ -131,7 +133,8 @@ pub fn mmapIterator() ?MmapIterator {
 	};
 }
 
-fn kindName(kind: u32) []const u8 {
+fn 
+kindName(kind: u32) []const u8 {
 	return switch (kind) {
 		1 => "available",
 		2 => "reserved",
@@ -143,7 +146,8 @@ fn kindName(kind: u32) []const u8 {
 }
 
 /// Print the bootloader handoff information and the physical memory map
-pub fn printInfo() void {
+pub fn 
+printInfo() void {
 	const inf = info orelse {
 		tty.set_color(.light_red, .black);
 		tty.print("ERROR: no Multiboot information available\n", .{});
@@ -176,7 +180,7 @@ pub fn printInfo() void {
 	tty.print("  memory map @ 0x{x}, {} bytes:\n", .{ inf.mmap_addr, inf.mmap_length });
 
 	var usable: u64 = 0;
-	while (it.next()) |entry| {
+	while(it.next()) |entry| {
 		const end = entry.base +| entry.length;
 		tty.print("    0x{x:0>8} - 0x{x:0>8}  {s} ({} KiB)\n", .{
 			entry.base,
@@ -184,7 +188,7 @@ pub fn printInfo() void {
 			kindName(entry.kind),
 			entry.length / 1024,
 		});
-		if (entry.kind == @intFromEnum(MemoryType.available)) {
+		if(entry.kind == @intFromEnum(MemoryType.available)) {
 			usable +|= entry.length;
 		}
 	}

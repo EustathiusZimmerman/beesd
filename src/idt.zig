@@ -255,7 +255,7 @@ init() void
 	tty.print("Loading IDT... ", .{});
 	defer tty.print("Done\n", .{});
 
-	for (0..NUMBER_OF_ENTRIES) |vector| {
+	for(0..NUMBER_OF_ENTRIES) |vector| {
 		set_gate(vector, isr_stub_table[vector], gdt.KERNEL_CODE_OFFSET, INTERRUPT_GATE, 0);
 	}
 
