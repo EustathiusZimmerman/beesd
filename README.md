@@ -1,6 +1,7 @@
 ![Banner](./assets/banner.png)
 # BEESD
 [![Repo](https://img.shields.io/badge/codeberg-repo?style=plastic&logo=codeberg&logoColor=white&label=repo&color=%232185D0)](https://codeberg.org/Eustathius/beesd)
+[![Mirror](https://img.shields.io/badge/github-mirror?style=plastic&logo=github&logoColor=%23ffffff&label=mirror&color=%23181717)](https://github.com/EustathiusZimmerman/beesd)
 [![License](https://img.shields.io/badge/GPLv3--or--later-license?style=plastic&logo=GPLv3&logoColor=white&label=license&color=%23BD0000)](https://www.gnu.org/licenses/gpl-3.0.txt)
 
 *BEESD* is a bare-metal 32-bit x86 (IA32) executable larping as a standalone kernel, featuring stuff.
