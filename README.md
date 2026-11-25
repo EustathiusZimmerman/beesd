@@ -13,7 +13,7 @@
  - [x] Serial support
  - [x] GDT/TSS
  - [x] IDT and interrupt handling (PIC/PIT)
- - [ ] MISC: Limine bootloader option
+ - [x] MISC: Limine bootloader option
  - [x] Keyboard support via PS/2
  - [x] Getting physical memory map
  - [x] Physical Memory Manager (PMM)
