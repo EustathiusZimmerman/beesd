@@ -71,12 +71,24 @@ pub const MmapEntry = packed struct {
 	kind: u32,
 };
 
+/// A boot module loaded by the bootloader.
+pub const Module = packed struct {
+	mod_start: u32,
+	mod_end: u32,
+	/// Command line associated with this module.
+	string: u32,
+	reserved: u32,
+};
+
 comptime {
 	if(@sizeOf(Info) != 116) {
 		@compileError("Multiboot info must be exactly 116 bytes");
 	}
 	if(@sizeOf(MmapEntry) != 24) {
 		@compileError("Multiboot memory map entry must be exactly 24 bytes");
+	}
+	if(@sizeOf(Module) != 16) {
+		@compileError("Multiboot module must be exactly 16 bytes");
 	}
 }
 
@@ -123,7 +135,7 @@ pub const MmapIterator = struct {
 
 /// Returns an iterator over the memory map or null
 pub fn 
-mmapIterator() ?MmapIterator {
+mmap_iterator() ?MmapIterator {
 	const inf = info orelse return null;
 	if (inf.flags & FLAG_MMAP == 0) return null;
 	if (inf.mmap_addr == 0 or inf.mmap_length == 0) return null;
@@ -134,7 +146,7 @@ mmapIterator() ?MmapIterator {
 }
 
 fn 
-kindName(kind: u32) []const u8 {
+kind_name(kind: u32) []const u8 {
 	return switch (kind) {
 		1 => "available",
 		2 => "reserved",
@@ -147,7 +159,7 @@ kindName(kind: u32) []const u8 {
 
 /// Print the bootloader handoff information and the physical memory map
 pub fn 
-printInfo() void {
+print_info() void {
 	const inf = info orelse {
 		tty.set_color(.light_red, .black);
 		tty.print("ERROR: no Multiboot information available\n", .{});
@@ -172,7 +184,7 @@ printInfo() void {
 		tty.print("  upper memory: {} KiB\n", .{inf.mem_upper});
 	}
 
-	var it = mmapIterator() orelse {
+	var it = mmap_iterator() orelse {
 		tty.print("  memory map: unavailable\n", .{});
 		return;
 	};
@@ -185,7 +197,7 @@ printInfo() void {
 		tty.print("    0x{x:0>8} - 0x{x:0>8}  {s} ({} KiB)\n", .{
 			entry.base,
 			end,
-			kindName(entry.kind),
+			kind_name(entry.kind),
 			entry.length / 1024,
 		});
 		if(entry.kind == @intFromEnum(MemoryType.available)) {

@@ -11,6 +11,7 @@ const pit = @import("pit.zig");
 const kb = @import("keyboard.zig");
 const multiboot = @import("multiboot.zig");
 const memory = @import("memory.zig");
+const pmm = @import("pmm.zig");
 
 const MULTIBOOT_HEADER_MAGIC = 0x1BADB002;
 const MULTIBOOT_FLAG_ALIGN = 1 << 0;
@@ -91,7 +92,7 @@ inline fn
 multiboot_dump(magic: u32, mbi_address: u32) void
 {
 	if(multiboot.init(magic, mbi_address)) {
-		multiboot.printInfo();
+		multiboot.print_info();
 	} else {
 		tty.set_color(.light_red, .black);
 		tty.print("WARNING: invalid Multiboot handoff (magic 0x{x})\n", .{magic});
@@ -115,6 +116,10 @@ kmain(magic: u32, mbi_address: u32) callconv(.c) noreturn
 	print_logo();
 
 	multiboot_dump(magic, mbi_address);
+
+	if(pmm.init(multiboot.info)) {
+		pmm.selfTest();
+	}
 
 	gdt.init();
 	idt.init();

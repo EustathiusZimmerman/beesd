@@ -16,7 +16,7 @@
  - [ ] MISC: Limine bootloader option
  - [x] Keyboard support via PS/2
  - [x] Getting physical memory map
- - [ ] Physical Memory Manager (PMM)
+ - [x] Physical Memory Manager (PMM)
  - [ ] Virtural Memory Manager (VMM), paging and general head shenanigans
  - [ ] Usermode
  - [ ] ...
